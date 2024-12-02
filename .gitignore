@@ -1,0 +1,21 @@
+#ignoruj binarki
+*.o
+ballsAndBins
+
+#ignoruj pliki z danymi
+*.dat
+
+#ignoruj wykresy
+*.png
+
+#katalog z wykresami
+wykresy/
+
+#FIFO
+./plot.gnuplot
+
+#kompilacja .tex
+*.aux
+*.log
+*600gf
+*.tfm
