@@ -18,9 +18,9 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
 
-# Compile object files from source files
+# Compile object files from source files make the compiler optimize the code
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -O3 -c $< -o $@
 
 # Clean up build artifacts
 .PHONY: clean

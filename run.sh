@@ -1,47 +1,4 @@
 #!/bin/bash
-plotujPojedynczy(){
-    local gnuplot_skrypt="plot.gnuplot"
-    local typ=$1
-    local pozycja=$2
-    cat > $gnuplot_skrypt << EOF
-    set terminal pngcairo size 800,600 enhanced font "Verdana,10"
-    set output "$typ.png"
-    set datafile separator ";"
-    set grid
-
-    set title "Wykres $typ w zależności od n"
-    set xlabel "n"
-    set ylabel "stosunek"
-
-    plot \
-        "ratios.dat" using 1:$pozycja title "$typ" with points pt 7 lc rgb "blue"
-EOF
-    gnuplot $gnuplot_skrypt
-}
-
-plotujPodwojny(){
-    local gnuplot_skrypt="plot.gnuplot"
-    local typ1=$1
-    local pozycja1=$2
-    local typ2=$3
-    local pozycja2=$4
-    cat > $gnuplot_skrypt << EOF
-    set terminal pngcairo size 800,600 enhanced font "Verdana,10"
-    set output "$typ1-$typ2.png"
-    set datafile separator ";"
-    set grid
-
-    set title "Wykres $typ1, $typ2 w zależności od n"
-    set xlabel "n"
-    set ylabel "stosunek"
-
-    plot \
-        "ratios.dat" using 1:$pozycja1 title "$typ1" with points pt 7 lc rgb "blue", \
-        "ratios.dat" using 1:$pozycja2 title "$typ2" with points pt 7 lc rgb "red"
-EOF
-    gnuplot $gnuplot_skrypt
-}
-
 plotujPotrojony(){
     local gnuplot_skrypt="plot.gnuplot"
     local typ1=$1
@@ -71,6 +28,7 @@ plotuj(){
     local gnuplot_skrypt="plot.gnuplot"
     local typ=$1
     local pozycja=$2
+    local rodzaj=$3
     cat > $gnuplot_skrypt << EOF
     set terminal pngcairo size 800,600 enhanced font "Verdana,10"
     set output "$typ.png"
@@ -82,12 +40,12 @@ plotuj(){
     set grid
 
     plot \
-        "wyniki.dat" using 1:$pozycja title "$typ" with points pt 7 lc rgb "blue", \
-        "srednie.dat" using 1:$pozycja title "Średnia $typ" with points pt 7 lc rgb "red"
+        "wyniki$rodzaj.dat" using 1:$pozycja title "$typ" with points pt 7 lc rgb "blue", \
+        "srednie$rodzaj.dat" using 1:$pozycja title "Średnia $typ" with points pt 7 lc rgb "red"
 EOF
-
-gnuplot $gnuplot_skrypt
+    gnuplot $gnuplot_skrypt
 }
+
 #skompiluj program
 make clean
 make
@@ -103,105 +61,104 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 wartosci_n=$@
-
 #przygotuj plik wynikowy
-if [ -f wyniki.dat ]; then
-    rm wyniki.dat
+if [ -f wynikiA.dat ]; then
+    rm wynikiA.dat
+fi
+
+if [ -f wynikiB.dat ]; then
+    rm wynikiB.dat
 fi
 
 #dla kazdej liczby n z argumentow wykonaj symulacje
 for n in $wartosci_n; do
-    echo "n=$n"
-    ./ballsAndBins $n >> wyniki.dat
+    echo "n=$n $(date +"%T")"
+    ./ballancedAllocation $n 1 >> wynikiA.dat
 done
 
+for n in $wartosci_n; do
+    echo "n=$n $(date +"%T")"
+    ./ballancedAllocation $n 2 >> wynikiB.dat
+done
+#wyniki sa zapisane jako n;Ln\n
+
 #policz srednie wartosci dla kazdego n:
-if [ -f srednie.dat ]; then
-    rm srednie.dat
+if [ -f srednieA.dat ]; then
+    rm srednieA.dat
+fi
+if [ -f srednieB.dat ]; then
+    rm srednieB.dat
 fi
 
-awk -F';' '
-BEGIN {
-}
-{
-    n = $1
-    for (i = 2; i <= NF; i++) {
-        sum[n,i] += $i
-        count[n,i] += 1
-    }
-    num_fields[n] = NF
-}
-END {
-    PROCINFO["sorted_in"] = "@ind_num_asc"  # Sort n numerically ascending
-    for (n in num_fields) {
-        output = n
-        nf = num_fields[n]
-        for (i = 2; i <= nf; i++) {
-            mean = sum[n,i] / count[n,i]
-            output = output ";" sprintf("%.2f", mean)
+awk -F";" '{
+    n=$1
+    L+=$2
+    n_ile+=1
+    if (n!=n_poprzednie) {
+        if (n_poprzednie!=0) {
+            print n_poprzednie";"L/n_ile
         }
-        print output >> "srednie.dat"
+        n_poprzednie=n
+        L=0
+        n_ile=0
     }
-}
-' wyniki.dat
+}' wynikiA.dat | sort -n > srednieA.dat
 
-#odpal gnuplota
-plotuj "B(n)" 2
-plotuj "U(n)" 3
-plotuj "C(n)" 4
-plotuj "D(n)" 5
-plotuj "D(n) - C(n)" 6
+awk -F";" '{
+    n=$1
+    L+=$2
+    n_ile+=1
+    if (n!=n_poprzednie) {
+        if (n_poprzednie!=0) {
+            print n_poprzednie";"L/n_ile
+        }
+        n_poprzednie=n
+        L=0
+        n_ile=0
+    }
+}' wynikiB.dat | sort -n > srednieB.dat
 
-#jezeli nie istnieje katalog wykresy to go stworz
+#przygotuj plik z danymi do wykresu
+if [ -f ratios.dat ]; then
+    rm ratios.dat
+fi
+
+#policz stosunek srednich wartosci dla kazdego n
+#zapisz do pliku ratios.dat w formacie n;ln1;ln2
+#ln1=LnA/f1(n)
+#ln2=LnB/f2(n)
+#f1(n)=log(n)/log(log(n))
+#f2(n)=log(log(n))/log(2)
+
+#otworz pliki z srednimi wartosciami
+exec 3< srednieA.dat
+exec 4< srednieB.dat
+for n in $wartosci_n; do
+    #liczby sa oddzielone srednikami n;Ln
+    read -u 3 lineA
+    read -u 4 lineB
+    lA=$(echo $lineA | cut -d";" -f2)
+    lB=$(echo $lineB | cut -d";" -f2)
+    f1=$(echo "l($n)/l(l($n))" | bc -l)
+    f2=$(echo "l(l($n))/l(2)" | bc -l)
+    lAr=$(echo "$lA/$f1" | bc -l)
+    lBr=$(echo "$lB/$f2" | bc -l)
+    echo "$n;$lA;$f1;$lAr;$lB;$f2;$lBr" >> ratios.dat
+done
+exec 3>&-
+exec 4>&-
+
+#narysuj wykresy
+plotuj "LnA" 2 "A"
+plotuj "LnB" 2 "B"
+
+plotujPotrojony "Ln1" 2 "f1" 3 "Ln1OVERf1" 4
+plotujPotrojony "Ln2" 5 "f2" 6 "Ln2OVERf2" 7
+
+#przesun wykresy do katalogu wykresy
+
 if [ ! -d wykresy ]; then
     mkdir wykresy
 fi
-#przenies wykresy do odpowiedniego katalogu
-mv *.png ./wykresy/
 
-#policzyc pozostale ciagi
-
-awk -F';' '
-BEGIN {
-    OFS = ";"
-}
-{
-    n = $1
-    b_n = $2
-    u_n = $3
-    c_n = $4
-    d_n = $5
-
-    sqrt_n = sqrt(n)
-    ln_n = log(n)
-    ln_ln_n = log(ln_n)
-    n_ln_n = n * ln_n
-    n2 = n * n
-
-    b_n_over_n = b_n / n
-    b_n_over_sqrt_n = b_n / sqrt_n
-    u_n_over_n = u_n / n
-    c_n_over_n = c_n / n
-    c_n_over_n_ln_n = (n_ln_n > 0) ? c_n / n_ln_n : 0
-    c_n_over_n2 = c_n / n2
-    d_n_over_n = d_n / n
-    d_n_over_n_ln_n = (n_ln_n > 0) ? d_n / n_ln_n : 0
-    d_n_over_n2 = d_n / n2
-    d_minus_c = d_n - c_n
-    d_minus_c_over_n = d_minus_c / n
-    d_minus_c_over_n_ln_n = (n_ln_n > 0) ? d_minus_c / n_ln_n : 0
-    d_minus_c_over_n_ln_ln_n = (ln_ln_n > 0) ? d_minus_c / (n * ln_ln_n) : 0
-
-    print n, b_n_over_n, b_n_over_sqrt_n, u_n_over_n, c_n_over_n, c_n_over_n_ln_n, c_n_over_n2, d_n_over_n, d_n_over_n_ln_n, d_n_over_n2, d_minus_c_over_n, d_minus_c_over_n_ln_n, d_minus_c_over_n_ln_ln_n
-}
-' srednie.dat > ratios.dat
-
-
-plotujPodwojny "B(n)NAn" 2 "B(n)NAsqrt(n)" 3
-plotujPojedynczy "U(n)NAn" 4
-plotujPotrojony "C(n)NAn" 5 "C(n)NAnln(n)" 6 "C(n)NAn^2" 7
-plotujPotrojony "D(n)NAn" 8 "D(n)NAnln(n)" 9 "D(n)NAn^2" 10
-plotujPotrojony "D(n)-C(n)NAn" 11 "D(n)-C(n)NAnln(n)" 12 "D(n)-C(n)NAnln(ln(n))" 13
-
-#przenies wykresy do odpowiedniego katalogu
-mv *.png ./wykresy/
+mv *.png wykresy

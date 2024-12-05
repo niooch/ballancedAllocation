@@ -1,6 +1,6 @@
 #ignoruj binarki
 *.o
-ballsAndBins
+ballancedAllocation
 
 #ignoruj pliki z danymi
 *.dat
