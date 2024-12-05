@@ -6,6 +6,7 @@ Jak wygląda rozłożenie kul wrzucanych do urn?
 Dane mamy n kul oraz n urn. Kule wrzucamy do urn losowo z pewną modyfikacją:
 * Wybieramy losowo d urn
 * Wrzucamy kulę do urny z najmniejszą liczbą kul
+
 Ile maksymalnie kul będzie znajdowało się w jednej z urn?
 
 # Jak to działa?

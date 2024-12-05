@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+\title{Symulowanie Procesów Losowych - Balanced Allocation}
+\author{Jakub Kogut}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Wstęp}
+Sprawodzanie do zadania domowego 3, zadanie 1. -- \textit{The Power of Two Choices/Balanced Allocation}.
+\section{Opis Zadania}
+Zadanie polegało na modyfikacji \href{https://github.com/niooch/ballsAndBins}{zadania z 2. listy} w taki sposób, aby zaimplementować algorytm Balanced Allocation. \newline
+Celem zadania było wyznaczenie maksymalnej ilości kul w jednej z urn w zależności od parametru $d$.
+\begin{enumerate}
+    \item $d=1$ - w sposób identyczny do zadania z 2. listy. Wyznaczamy $L_n^{(1)}$.
+    \item $d=2$ - algorytm Balanced Allocation. Wyznaczamy $L_n^{(2)}$.
+\end{enumerate}
+\section{Metodologia}
+Podana była ustalona wartość $k=50$ powtórzeń eksperymentu dla każdego $n$. Wartość $n$ miała pochodzić ze zbioru $\{k \times 10^3: k \in \{1, ..., 10^3\}\}$. Dla każdego $n$ wyznaczano średnią z $k$ powtórzeń eksperymentu. Następnie wyznaczano odpowiednio wartość $L_n^{(1)}$ oraz $L_n^{(2)}$.
+\section{Wnioski}
+W analogii do rozłożenia requestów na serwery, algorytm Balanced Allocation działa lepiej niż algorytm Random Allocation. Wartość $L_n^{(2)}$ rośnie wolniej niż $L_n^{(1)}$ z zwiększającym się $n$. \newline
+Na podstawie przeprowadzonych symulacji i wygenerowanych wykresów można wyciągnać natępujące wnioski:
+\subsection{Brak Algorytmu Balanced Allocation}
+Wartość $L_n^{(1)}$ rośnie asymptotycznie do $\frac{log(n)}{log(log(n))}$ zgodnie z \href{fig:Ln1}{wykresem.}, koncentracja wyników w okół wartości średniej jest dość niska, co pokazuje \href{fig:LnA}{ten wykres.} Wynika to jednak z faktu, że wartości wyników są całkowite, a średnia jest jednak ułamkiem.
+\subsection{Algorytm Balanced Allocation}
+Wartość $L_n^{(2)}$ rośnie asymptotycznie do $\frac{log(log(n))}{log(2)}$ zgodnie z \href{fig:Ln2}{wykresem.}, koncentracja wyników w okół wartości średniej jest podobna do $L_n^{(1)}$, co pokazuje \href{fig:LnB}{ten wykres.}
+
+\section{Podsumowanie}
+Jeżeli chodzi o zastosowanie algorytmu Balanced Allocation w praktyce, to zdecydowanie warto go stosować, ponieważ zdecydowanie lepiej radziłby sobie z rozłożeniem requestów na serwery niż algorytm Random Allocation. Wartość $L_n^{(2)}$ rośnie wolniej niż $L_n^{(1)}$ z zwiększającym się $n$. \newline
+
+
+\section{Wykresy}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykresy/Ln1-f1-Ln1Overf1.png}
+    \caption{Wykres watosci $\frac{L_n^{(1)}}{f_1}$}
+    \label{fig:Ln1}
+\end{figure}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykresy/Ln2-f2-Ln2Overf2.png}
+    \caption{Wykres watosci $\frac{L_n^{(2)}}{f_2}$}
+    \label{fig:Ln2}
+\end{figure}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykresy/LnA.png}
+    \caption{Wykres wartości $L_n^{(1)}$}
+    \label{fig:LnA}
+\end{figure}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykresy/LnB.png}
+    \caption{Wykres wartości $L_n^{(2)}$}
+    \label{fig:Ln1}
+\end{figure}
+\end{document}

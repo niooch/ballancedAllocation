@@ -116,6 +116,11 @@ awk -F";" '{
         L=0
         n_ile=0
     }
+    n_poprzednie=n
+} END {
+    if (n_poprzednie!=0) {
+    print n_poprzednie";"L/n_ile
+    }
 }' wynikiB.dat | sort -n > srednieB.dat
 
 #przygotuj plik z danymi do wykresu
