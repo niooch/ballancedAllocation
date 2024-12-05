@@ -23,7 +23,7 @@
 \section{Wstęp}
 Sprawodzanie do zadania domowego 3, zadanie 1. -- \textit{The Power of Two Choices/Balanced Allocation}.
 \section{Opis Zadania}
-Zadanie polegało na modyfikacji \hyperref{https://github.com/niooch/ballsAndBins}{zadania z 2. listy} w taki sposób, aby zaimplementować algorytm Balanced Allocation. \newline
+Zadanie polegało na modyfikacji \href{https://github.com/niooch/ballsAndBins}{zadania z 2. listy} w taki sposób, aby zaimplementować algorytm Balanced Allocation. \newline
 Celem zadania było wyznaczenie maksymalnej ilości kul w jednej z urn w zależności od parametru $d$.
 \begin{enumerate}
     \item $d=1$ - w sposób identyczny do zadania z 2. listy. Wyznaczamy $L_n^{(1)}$.
@@ -37,7 +37,7 @@ Na podstawie przeprowadzonych symulacji i wygenerowanych wykresów można wycią
 \subsection{Brak Algorytmu Balanced Allocation}
 Wartość $L_n^{(1)}$ rośnie asymptotycznie do $\frac{log(n)}{log(log(n))}$ zgodnie z \hyperref[fig:Ln1]{wykresem,} koncentracja wyników w okół wartości średniej jest dość niska, co pokazuje \hyperref[fig:LnA]{ten wykres.} Wynika to jednak z faktu, że wartości wyników są całkowite, a średnia jest jednak ułamkiem.
 \subsection{Algorytm Balanced Allocation}
-Wartość $L_n^{(2)}$ rośnie asymptotycznie do $\frac{log(log(n))}{log(2)}$ zgodnie z \hyperref[fig:Ln2]{wykresem.}, koncentracja wyników w okół wartości średniej jest podobna do $L_n^{(1)}$, co pokazuje \hyperref[fig:LnB]{ten wykres.}
+Wartość $L_n^{(2)}$ rośnie asymptotycznie do $\frac{log(log(n))}{log(2)}$ zgodnie z \hyperref[fig:Ln2]{wykresem,} koncentracja wyników w okół wartości średniej jest podobna do $L_n^{(1)}$, co pokazuje \hyperref[fig:LnB]{ten wykres.}
 
 \section{Podsumowanie}
 Jeżeli chodzi o zastosowanie algorytmu Balanced Allocation w praktyce, to zdecydowanie warto go stosować, ponieważ zdecydowanie lepiej radziłby sobie z rozłożeniem requestów na serwery niż algorytm Random Allocation. Wartość $L_n^{(2)}$ rośnie wolniej niż $L_n^{(1)}$ z zwiększającym się $n$. \newline
